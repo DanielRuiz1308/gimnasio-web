@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rutinas</title>
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+
+  <aside th:replace="~{fragmentos/layout :: menu('rutinas')}"></aside>
+
+  <main class="contenido">
+    <div class="encabezado-pagina">
+      <h1 class="titulo-pagina">Rutinas</h1>
+      <a class="boton" th:href="@{/rutinas/nuevo}">+ Nueva rutina</a>
+    </div>
+
+    <div class="aviso-ok" th:if="${mensajeOk}" th:text="${mensajeOk}">Listo</div>
+    <div class="aviso-error" th:if="${mensajeError}" th:text="${mensajeError}">Error</div>
+
+    <div class="tarjeta">
+      <div class="barra-busqueda">
+        <input type="search" id="buscador" data-tabla="table.tabla"
+               placeholder="Buscar por cliente, rutina, entrenador, nivel u objetivo...">
+        <p class="contador" id="contador"
+           th:text="${#lists.size(rutinas)} + ' registros'">0 registros</p>
+      </div>
+
+      <table class="tabla">
+        <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Rutina</th>
+          <th>Entrenador</th>
+          <th>Nivel</th>
+          <th>Objetivo</th>
+          <th>Ejercicios</th>
+          <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="r : ${rutinas}">
+          <td>
+            <div class="celda-persona">
+              <div class="avatar" th:attr="data-inicial=${#strings.toUpperCase(#strings.substring(r.clienteNombre, 0, 1))}">
+                <img th:src="@{/clientes/{id}/foto(id=${r.clienteId})}" alt="" loading="lazy" onerror="this.remove()">
+              </div>
+              <span th:text="${r.clienteNombre}">Cliente</span>
+            </div>
+          </td>
+          <td th:text="${r.nombre}">Rutina</td>
+          <td th:text="${r.entrenadorNombre}">Entrenador</td>
+          <td th:text="${r.nivel} ?: '—'">Nivel</td>
+          <td th:text="${r.objetivo} ?: '—'">Objetivo</td>
+          <td th:text="${r.totalEjercicios}">0</td>
+          <td class="col-acciones">
+            <div class="acciones-fila">
+              <a class="enlace-editar" th:href="@{/rutinas/{id}(id=${r.id})}">Ver</a>
+              <a class="enlace-editar" th:href="@{/rutinas/{id}/editar(id=${r.id})}">Editar</a>
+              <form th:action="@{/rutinas/{id}/eliminar(id=${r.id})}" method="post"
+                    onsubmit="return confirm('¿Seguro que quieres eliminar esta rutina?');">
+                <button type="submit" class="enlace-eliminar">Eliminar</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(rutinas)}">
+          <td colspan="7" class="vacio">Todavía no hay rutinas registradas</td>
+        </tr>
+        <tr id="sin-resultados" hidden>
+          <td colspan="7" class="vacio">Ninguna rutina coincide con la búsqueda</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+</div>
+
+<script th:src="@{/js/buscador.js}"></script>
+</body>
+</html>

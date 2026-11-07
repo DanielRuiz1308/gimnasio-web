@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Renovar membresía</title>
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+
+  <aside th:replace="~{fragmentos/layout :: menu('membresias')}"></aside>
+
+  <main class="contenido">
+    <h1 class="titulo-pagina">Renovar membresía</h1>
+
+    <div class="tarjeta formulario">
+      <div class="aviso-error" th:if="${error}" th:text="${error}">Mensaje de error</div>
+
+      <div class="resumen-cliente">
+        <div class="avatar" th:attr="data-inicial=${#strings.toUpperCase(#strings.substring(cliente.nombre, 0, 1))}">
+          <img th:src="@{/clientes/{id}/foto(id=${cliente.clienteId})}" alt="" onerror="this.remove()">
+        </div>
+        <div>
+          <strong th:text="${cliente.nombre}">Nombre</strong>
+          <p>
+                        <span class="etiqueta"
+                              th:classappend="${cliente.estado == 'Vigente'} ? 'etiqueta-vigente' : (${cliente.estado == 'Vencida'} ? 'etiqueta-vencida' : 'etiqueta-sin')"
+                              th:text="${cliente.estado}">Vigente</span>
+            <span th:if="${cliente.fechaVencimiento != null}"
+                  th:text="'Vence el ' + ${cliente.fechaVencimiento}"></span>
+          </p>
+        </div>
+      </div>
+
+      <form th:action="@{/membresias/{id}/renovar(id=${cliente.clienteId})}" method="post">
+
+        <label for="tipoId">Tipo de membresía</label>
+        <select id="tipoId" name="tipoId" required>
+          <option th:each="t : ${tipos}" th:value="${t.id}"
+                  th:text="${t.nombre} + ' — $' + ${#numbers.formatDecimal(t.precio, 1, 'POINT', 0, 'COMMA')}">Mensual</option>
+        </select>
+
+        <label for="metodoPago">Método de pago</label>
+        <select id="metodoPago" name="metodoPago" required>
+          <option value="efectivo">Efectivo</option>
+          <option value="transferencia">Transferencia</option>
+          <option value="tarjeta">Tarjeta</option>
+        </select>
+
+        <div class="acciones">
+          <a class="boton-secundario" th:href="@{/membresias}">Cancelar</a>
+          <button type="submit" class="boton">Confirmar pago</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+</div>
+</body>
+</html>

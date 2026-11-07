@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Usuarios - Lifting Club Fitness</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragmentos/layout :: menu('usuarios')}"></aside>
+    <main class="contenido">
+        <div class="encabezado-pagina">
+            <h1 class="titulo-pagina">Usuarios del sistema</h1>
+            <a class="boton" th:href="@{/usuarios/nuevo}">+ Nuevo usuario</a>
+        </div>
+
+        <div class="aviso-ok" th:if="${mensajeOk}" th:text="${mensajeOk}"></div>
+        <div class="aviso-error" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+
+        <div class="tarjeta">
+            <div class="barra-busqueda">
+                <input type="search" id="buscador" placeholder="Buscar por nombre, usuario o rol...">
+                <p class="contador" th:text="${#lists.size(usuarios)} + ' registros'">0 registros</p>
+            </div>
+            <table class="tabla">
+                <thead>
+                <tr><th>ID</th><th>Nombre</th><th>Usuario</th><th>Rol</th><th>Entrenador</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${usuarios}">
+                    <td th:text="${u.id}">1</td>
+                    <td th:text="${u.nombreCompleto}">Nombre</td>
+                    <td th:text="${u.nombreUsuario}">usuario</td>
+                    <td><span class="etiqueta" th:text="${u.rolTexto}">Rol</span></td>
+                    <td th:text="${u.entrenadorNombre != null} ? ${u.entrenadorNombre} : '—'">—</td>
+                    <td class="col-acciones">
+                        <div class="acciones-fila">
+                            <a class="enlace-editar" th:href="@{/usuarios/{id}/editar(id=${u.id})}">Editar</a>
+                            <a class="enlace-editar" th:href="@{/usuarios/{id}/clave(id=${u.id})}">Contraseña</a>
+                            <form th:if="${u.id != session.usuario.id}"
+                                  th:action="@{/usuarios/{id}/eliminar(id=${u.id})}" method="post"
+                                  onsubmit="return confirm('¿Eliminar este usuario?');">
+                                <button type="submit" class="enlace-eliminar">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+<script th:src="@{/js/buscador.js}"></script>
+</body>
+</html>

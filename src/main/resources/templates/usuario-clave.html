@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Contraseña - Lifting Club Fitness</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragmentos/layout :: menu('usuarios')}"></aside>
+    <main class="contenido">
+        <h1 class="titulo-pagina">Cambiar contraseña</h1>
+
+        <form class="tarjeta formulario" method="post" th:action="@{/usuarios/{id}/clave(id=${usuario.id})}">
+            <div class="aviso-error" th:if="${error}" th:text="${error}"></div>
+
+            <p>Usuario: <strong th:text="${usuario.nombreUsuario}">usuario</strong>
+               (<span th:text="${usuario.nombreCompleto}">Nombre</span>)</p>
+
+            <div class="fila">
+                <div>
+                    <label for="clave">Contraseña nueva * (mín. 8)</label>
+                    <input id="clave" name="clave" type="password" minlength="8" autocomplete="new-password" required>
+                </div>
+                <div>
+                    <label for="confirmacion">Confirmar contraseña *</label>
+                    <input id="confirmacion" name="confirmacion" type="password" minlength="8" autocomplete="new-password" required>
+                </div>
+            </div>
+
+            <div class="acciones">
+                <a class="boton-secundario" th:href="@{/usuarios}">Cancelar</a>
+                <button class="boton" type="submit">Guardar contraseña</button>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

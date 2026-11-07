@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Menú lateral compartido. "activo" indica qué módulo resaltar. Cada rol ve solo sus módulos. -->
+<aside class="menu-lateral" th:fragment="menu(activo)" th:with="u=${session.usuario}">
+  <!-- Interruptor del menú en celular (sin JavaScript): el botón de tres rayas marca esta casilla -->
+  <input type="checkbox" id="menu-toggle" class="menu-check" aria-label="Abrir menú">
+
+  <div class="menu-marca">
+    <a th:href="@{/}">
+      <img th:src="@{/img/logo-marca.png}" alt="">
+      <span class="marca-texto">Lifting Club<span>Fitness</span></span>
+    </a>
+  </div>
+
+  <label for="menu-toggle" class="menu-boton" aria-label="Menú"><span></span><span></span><span></span></label>
+
+  <nav>
+    <a class="item" th:classappend="${activo == 'inicio'} ? 'activo'" th:href="@{/}">
+      <svg class="icono"><use th:href="@{/img/iconos.svg#inicio}"/></svg>Inicio</a>
+
+    <th:block th:if="${u.puede('clientes') or u.puede('entrenadores') or u.puede('administradores')}">
+      <div class="menu-seccion">Personas</div>
+      <a class="item" th:if="${u.puede('clientes')}"
+         th:classappend="${activo == 'clientes'} ? 'activo'" th:href="@{/clientes}">
+        <svg class="icono"><use th:href="@{/img/iconos.svg#clientes}"/></svg>Clientes</a>
+      <a class="item" th:if="${u.puede('entrenadores')}"
+         th:classappend="${activo == 'entrenadores'} ? 'activo'" th:href="@{/entrenadores}">
+        <svg class="icono"><use th:href="@{/img/iconos.svg#entrenadores}"/></svg>Entrenadores</a>
+      <a class="item" th:if="${u.puede('administradores')}"
+         th:classappend="${activo == 'administradores'} ? 'activo'" th:href="@{/administradores}">
+        <svg class="icono"><use th:href="@{/img/iconos.svg#administradores}"/></svg>Administradores</a>
+    </th:block>
+
+    <th:block th:if="${u.puede('membresias') or u.puede('rutinas') or u.puede('asistencia') or u.puede('registro')}">
+      <div class="menu-seccion">Gimnasio</div>
+      <a class="item" th:if="${u.puede('membresias')}"
+         th:classappend="${activo == 'membresias'} ? 'activo'" th:href="@{/membresias}">
+        <svg class="icono"><use th:href="@{/img/iconos.svg#membresias}"/></svg>Membresías</a>
+      <a class="item" th:if="${u.puede('rutinas')}"
+         th:classappend="${activo == 'rutinas'} ? 'activo'" th:href="@{/rutinas}">
+        <svg class="icono"><use th:href="@{/img/iconos.svg#rutinas}"/></svg>Rutinas</a>
+      <a class="item" th:if="${u.puede('asistencia')}"
+         th:classappend="${activo == 'asistencia'} ? 'activo'" th:href="@{/asistencia}">
+        <svg class="icono"><use th:href="@{/img/iconos.svg#asistencia}"/></svg>Asistencia</a>
+      <a class="item" th:if="${u.puede('registro')}"
+         th:classappend="${activo == 'registro'} ? 'activo'" th:href="@{/registro-fisico}">
+        <svg class="icono"><use th:href="@{/img/iconos.svg#registro}"/></svg>Registro físico</a>
+    </th:block>
+
+    <th:block th:if="${u.puede('reportes')}">
+      <div class="menu-seccion">Análisis</div>
+      <a class="item" th:classappend="${activo == 'reportes'} ? 'activo'" th:href="@{/reportes}">
+        <svg class="icono"><use th:href="@{/img/iconos.svg#reportes}"/></svg>Reportes</a>
+    </th:block>
+
+    <th:block th:if="${u.puede('usuarios')}">
+      <div class="menu-seccion">Sistema</div>
+      <a class="item" th:classappend="${activo == 'usuarios'} ? 'activo'" th:href="@{/usuarios}">
+        <svg class="icono"><use th:href="@{/img/iconos.svg#usuarios}"/></svg>Usuarios</a>
+    </th:block>
+  </nav>
+
+  <div class="menu-usuario">
+    <strong th:text="${u.nombreCompleto}">Nombre</strong>
+    <small th:text="${u.rolTexto}">Rol</small>
+    <form th:action="@{/logout}" method="post">
+      <button type="submit" class="enlace-eliminar">Cerrar sesión</button>
+    </form>
+  </div>
+</aside>
+
+</body>
+</html>

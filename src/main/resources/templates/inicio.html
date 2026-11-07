@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inicio</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+
+    <aside th:replace="~{fragmentos/layout :: menu('inicio')}"></aside>
+
+    <main class="contenido" th:with="u=${session.usuario}">
+        <h1 class="titulo-pagina" th:text="'Hola, ' + ${u.nombreCompleto}">Hola</h1>
+        <p class="bienvenida">Esto es lo que está pasando hoy en el gimnasio.</p>
+
+        <div class="aviso-error" th:if="${errorResumen}" th:text="${errorResumen}"></div>
+
+        <!-- Indicadores del día: cada rol ve solo los de sus módulos -->
+        <div class="indicadores" th:if="${resumen != null}">
+            <a class="indicador" th:if="${u.puede('asistencia')}" th:href="@{/asistencia}">
+                <span class="indicador-nombre">Asistencias hoy</span>
+                <strong class="indicador-valor" th:text="${resumen.asistenciasHoy}">0</strong>
+            </a>
+            <a class="indicador indicador-ok" th:if="${u.puede('membresias')}" th:href="@{/membresias}">
+                <span class="indicador-nombre">Membresías vigentes</span>
+                <strong class="indicador-valor" th:text="${resumen.vigentes}">0</strong>
+            </a>
+            <a class="indicador indicador-alerta" th:if="${u.puede('membresias')}" th:href="@{/membresias}">
+                <span class="indicador-nombre">Por vencer (7 días)</span>
+                <strong class="indicador-valor" th:text="${resumen.porVencer}">0</strong>
+            </a>
+            <a class="indicador indicador-peligro" th:if="${u.puede('membresias')}" th:href="@{/membresias}">
+                <span class="indicador-nombre">Vencidas</span>
+                <strong class="indicador-valor" th:text="${resumen.vencidas}">0</strong>
+            </a>
+            <a class="indicador" th:if="${u.puede('reportes')}" th:href="@{/reportes}">
+                <span class="indicador-nombre">Ingresos del mes</span>
+                <strong class="indicador-valor"
+                        th:text="'$' + ${#numbers.formatDecimal(resumen.ingresosMes, 1, 'POINT', 0, 'COMMA')}">$0</strong>
+            </a>
+        </div>
+
+        <!-- Quién vence pronto -->
+        <div class="tarjeta" th:if="${resumen != null and u.puede('membresias')}">
+            <h2 class="subtitulo">Vencen pronto</h2>
+            <p class="vacio" th:if="${#lists.isEmpty(resumen.proximasAVencer)}">
+                Ninguna membresía vence en los próximos 7 días.</p>
+            <ul class="lista-vence" th:if="${!#lists.isEmpty(resumen.proximasAVencer)}">
+                <li th:each="m : ${resumen.proximasAVencer}" th:with="d=${m.diasRestantes}">
+                    <span class="vence-nombre" th:text="${m.nombre}">Nombre</span>
+                    <span class="vence-tipo" th:text="${m.tipo}">Tipo</span>
+                    <span class="vence-etiqueta" th:classappend="${d < 0} ? 'vence-peligro' : 'vence-alerta'"
+                          th:text="${d == 0} ? 'Vence hoy' : (${d > 0} ? 'En ' + ${d} + (${d == 1} ? ' día' : ' días') : 'Venció hace ' + ${-d} + (${d == -1} ? ' día' : ' días'))">En 3 días</span>
+                </li>
+            </ul>
+        </div>
+
+        <h2 class="subtitulo">Módulos</h2>
+        <div class="modulos">
+            <a class="modulo" th:if="${u.puede('clientes')}" th:href="@{/clientes}">
+                <strong>Clientes</strong><span>Registro y datos de los clientes</span></a>
+            <a class="modulo" th:if="${u.puede('entrenadores')}" th:href="@{/entrenadores}">
+                <strong>Entrenadores</strong><span>Equipo de entrenadores</span></a>
+            <a class="modulo" th:if="${u.puede('administradores')}" th:href="@{/administradores}">
+                <strong>Administradores</strong><span>Personal administrativo</span></a>
+            <a class="modulo" th:if="${u.puede('membresias')}" th:href="@{/membresias}">
+                <strong>Membresías</strong><span>Estado y renovación de pagos</span></a>
+            <a class="modulo" th:if="${u.puede('rutinas')}" th:href="@{/rutinas}">
+                <strong>Rutinas</strong><span>Planes de entrenamiento</span></a>
+            <a class="modulo" th:if="${u.puede('asistencia')}" th:href="@{/asistencia}">
+                <strong>Asistencia</strong><span>Registrar entradas al gimnasio</span></a>
+            <a class="modulo" th:if="${u.puede('registro')}" th:href="@{/registro-fisico}">
+                <strong>Registro físico</strong><span>Peso, altura e IMC</span></a>
+            <a class="modulo" th:if="${u.puede('reportes')}" th:href="@{/reportes}">
+                <strong>Reportes</strong><span>Gráficos e ingresos</span></a>
+        </div>
+    </main>
+
+</div>
+</body>
+</html>

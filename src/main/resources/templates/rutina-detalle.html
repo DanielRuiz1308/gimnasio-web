@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rutina</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+
+    <aside th:replace="~{fragmentos/layout :: menu('rutinas')}"></aside>
+
+    <main class="contenido">
+        <div class="encabezado-pagina">
+            <h1 class="titulo-pagina" th:text="${rutina.nombre}">Rutina</h1>
+            <div class="no-imprimir">
+                <a class="boton-secundario" th:href="@{/rutinas}">Volver</a>
+                <button type="button" class="boton-secundario boton-plano" onclick="window.print()">Imprimir</button>
+                <a class="boton" th:href="@{/rutinas/{id}/editar(id=${rutina.id})}">Editar</a>
+            </div>
+        </div>
+
+        <div class="tarjeta">
+            <div class="datos-rutina">
+                <div><span>Cliente</span><strong th:text="${rutina.clienteNombre}">Cliente</strong></div>
+                <div><span>Entrenador</span><strong th:text="${rutina.entrenadorNombre}">Entrenador</strong></div>
+                <div><span>Nivel</span><strong th:text="${rutina.nivel} ?: '—'">Nivel</strong></div>
+                <div><span>Objetivo</span><strong th:text="${rutina.objetivo} ?: '—'">Objetivo</strong></div>
+            </div>
+
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Ejercicio</th>
+                    <th>Series</th>
+                    <th>Repeticiones</th>
+                    <th>Descanso</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e, fila : ${rutina.ejercicios}">
+                    <td th:text="${fila.count}">1</td>
+                    <td th:text="${e.nombre}">Ejercicio</td>
+                    <td th:text="${e.series}">4</td>
+                    <td th:text="${e.repeticiones}">10</td>
+                    <td th:text="${e.descanso != null} ? ${e.descanso} + ' seg' : '—'">60 seg</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(rutina.ejercicios)}">
+                    <td colspan="5" class="vacio">Esta rutina no tiene ejercicios</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+</div>
+</body>
+</html>

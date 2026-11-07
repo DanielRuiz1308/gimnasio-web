@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Iniciar sesión</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="login-fondo">
+    <div class="tarjeta formulario login-tarjeta">
+
+        <div class="login-marca">
+            <img th:src="@{/img/logo-marca.png}" alt="">
+            <h1>Lifting Club<span>Fitness</span></h1>
+            <p>Sistema de gestión</p>
+        </div>
+
+        <div class="aviso-error" th:if="${error}" th:text="${error}">Mensaje de error</div>
+
+        <form th:action="@{/login}" method="post">
+            <label for="usuario">Usuario</label>
+            <input type="text" id="usuario" name="usuario" th:value="${usuario}"
+                   autocomplete="username" autofocus required>
+
+            <label for="clave">Contraseña</label>
+            <input type="password" id="clave" name="clave" autocomplete="current-password" required>
+
+            <button type="submit" class="boton">Iniciar sesión</button>
+        </form>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acceso denegado</title>
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+
+  <aside th:replace="~{fragmentos/layout :: menu('')}"></aside>
+
+  <main class="contenido">
+    <h1 class="titulo-pagina">Acceso denegado</h1>
+    <div class="tarjeta">
+      <p>Tu rol no tiene permiso para entrar a esa sección.</p>
+      <a class="boton" th:href="@{/}">Volver al inicio</a>
+    </div>
+  </main>
+
+</div>
+</body>
+</html>

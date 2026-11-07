@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Administradores</title>
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+
+  <aside th:replace="~{fragmentos/layout :: menu('administradores')}"></aside>
+
+  <main class="contenido">
+    <div class="encabezado-pagina">
+      <h1 class="titulo-pagina">Gestión de Administradores</h1>
+      <a class="boton" th:href="@{/administradores/nuevo}">+ Nuevo administrador</a>
+    </div>
+
+    <div class="aviso-ok" th:if="${mensajeOk}" th:text="${mensajeOk}">Listo</div>
+    <div class="aviso-error" th:if="${mensajeError}" th:text="${mensajeError}">Error</div>
+
+    <div class="tarjeta">
+      <div class="barra-busqueda">
+        <input type="search" id="buscador" data-tabla="table.tabla"
+               placeholder="Buscar por nombre, documento, permisos...">
+        <p class="contador" id="contador"
+           th:text="${#lists.size(administradores)} + ' registros'">0 registros</p>
+      </div>
+
+      <table class="tabla">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Documento</th>
+          <th>Teléfono</th>
+          <th>Email</th>
+          <th>Permisos</th>
+          <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${administradores}">
+          <td th:text="${a.id}">1</td>
+          <td>
+            <div class="celda-persona">
+              <div class="avatar" th:attr="data-inicial=${#strings.toUpperCase(#strings.substring(a.nombre, 0, 1))}">
+                <img th:src="@{/administradores/{id}/foto(id=${a.id})}" alt="" loading="lazy" onerror="this.remove()">
+              </div>
+              <span th:text="${a.nombre}">Nombre</span>
+            </div>
+          </td>
+          <td th:text="${a.documento}">Documento</td>
+          <td th:text="${a.telefono}">Teléfono</td>
+          <td th:text="${a.email}">Email</td>
+          <td th:text="${a.permisos}">Permisos</td>
+          <td class="col-acciones">
+            <div class="acciones-fila">
+              <a class="enlace-editar" th:href="@{/administradores/{id}/editar(id=${a.id})}">Editar</a>
+              <form th:action="@{/administradores/{id}/eliminar(id=${a.id})}" method="post"
+                    onsubmit="return confirm('¿Seguro que quieres eliminar este administrador?');">
+                <button type="submit" class="enlace-eliminar">Eliminar</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(administradores)}">
+          <td colspan="7" class="vacio">Todavía no hay administradores registrados</td>
+        </tr>
+        <tr id="sin-resultados" hidden>
+          <td colspan="7" class="vacio">Ningún administrador coincide con la búsqueda</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+</div>
+
+<script th:src="@{/js/buscador.js}"></script>
+</body>
+</html>

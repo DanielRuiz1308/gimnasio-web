@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Asistencia</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+
+    <aside th:replace="~{fragmentos/layout :: menu('asistencia')}"></aside>
+
+    <main class="contenido">
+        <h1 class="titulo-pagina">Asistencia</h1>
+
+        <div class="aviso-ok" th:if="${mensajeOk}" th:text="${mensajeOk}">Listo</div>
+        <div class="aviso-error" th:if="${mensajeError}" th:text="${mensajeError}">Error</div>
+
+        <div class="asistencia-grid">
+
+            <div class="tarjeta formulario">
+                <h2 class="subtitulo">Registrar asistencia</h2>
+
+                <form id="form-asistencia" th:action="@{/asistencia}" method="post">
+
+                    <label for="cliente-texto">Cliente *</label>
+                    <input type="text" id="cliente-texto" list="lista-clientes"
+                           placeholder="Escribe nombre o documento..." autocomplete="off">
+                    <input type="hidden" id="clienteId" name="clienteId">
+                    <datalist id="lista-clientes">
+                        <option th:each="c : ${clientes}"
+                                th:value="${c.nombre + ' — ' + c.documento}"
+                                th:attr="data-id=${c.clienteId},data-estado=${c.estado}"></option>
+                    </datalist>
+                    <p class="alerta" id="cliente-aviso" hidden></p>
+
+                    <label for="entrenadorId">Entrenador *</label>
+                    <select id="entrenadorId" name="entrenadorId" required>
+                        <option th:each="e : ${entrenadores}" th:value="${e.id}" th:text="${e.nombre}">Entrenador</option>
+                    </select>
+
+                    <p class="ayuda-foto ayuda-izquierda">La fecha, la hora y el turno se registran solos.</p>
+
+                    <div class="acciones">
+                        <button type="submit" class="boton">Registrar asistencia</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="tarjeta">
+                <div class="barra-busqueda">
+                    <input type="search" id="buscador" data-tabla="table.tabla"
+                           placeholder="Buscar por cliente, entrenador, fecha o turno...">
+                    <p class="contador" id="contador"
+                       th:text="${#lists.size(asistencias)} + ' registros'">0 registros</p>
+                </div>
+
+                <table class="tabla">
+                    <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Entrenador</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Turno</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="a : ${asistencias}">
+                        <td>
+                            <div class="celda-persona">
+                                <div class="avatar" th:attr="data-inicial=${#strings.toUpperCase(#strings.substring(a.clienteNombre, 0, 1))}">
+                                    <img th:src="@{/clientes/{id}/foto(id=${a.clienteId})}" alt="" loading="lazy" onerror="this.remove()">
+                                </div>
+                                <span th:text="${a.clienteNombre}">Cliente</span>
+                            </div>
+                        </td>
+                        <td th:text="${a.entrenadorNombre}">Entrenador</td>
+                        <td th:text="${a.fecha}">2026-01-01</td>
+                        <td th:text="${a.horaTexto}">07:15</td>
+                        <td th:text="${a.turno}">mañana</td>
+                        <td class="col-acciones">
+                            <div class="acciones-fila">
+                                <form th:action="@{/asistencia/{id}/eliminar(id=${a.id})}" method="post"
+                                      onsubmit="return confirm('¿Eliminar este registro de asistencia?');">
+                                    <button type="submit" class="enlace-eliminar">Eliminar</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(asistencias)}">
+                        <td colspan="6" class="vacio">Todavía no hay asistencias registradas</td>
+                    </tr>
+                    <tr id="sin-resultados" hidden>
+                        <td colspan="6" class="vacio">Ninguna asistencia coincide con la búsqueda</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="ayuda-foto ayuda-izquierda" th:text="'Se muestran las últimas ' + ${maximo} + ' asistencias.'"></p>
+            </div>
+
+        </div>
+    </main>
+
+</div>
+
+<script th:src="@{/js/buscador.js}"></script>
+<script th:src="@{/js/asistencia.js}"></script>
+</body>
+</html>

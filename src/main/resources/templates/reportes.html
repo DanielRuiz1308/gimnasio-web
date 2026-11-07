@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reportes</title>
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+
+  <aside th:replace="~{fragmentos/layout :: menu('reportes')}"></aside>
+
+  <main class="contenido">
+    <h1 class="titulo-pagina">Reportes</h1>
+
+    <div class="kpis">
+      <div class="tarjeta dato-tarjeta">
+        <span>Clientes</span>
+        <strong th:text="${reporte.totalClientes}">0</strong>
+      </div>
+      <div class="tarjeta dato-tarjeta">
+        <span>Membresías vigentes</span>
+        <strong th:text="${reporte.membresiasVigentes}">0</strong>
+      </div>
+      <div class="tarjeta dato-tarjeta">
+        <span>Membresías vencidas</span>
+        <strong th:text="${reporte.membresiasVencidas}">0</strong>
+      </div>
+      <div class="tarjeta dato-tarjeta">
+        <span>Ingresos del mes</span>
+        <strong th:text="'$' + ${#numbers.formatDecimal(reporte.ingresosMes, 1, 'POINT', 0, 'COMMA')}">$0</strong>
+      </div>
+    </div>
+
+    <div class="graficos">
+
+      <div class="tarjeta tarjeta-grafico grafico-ancho">
+        <h2>Ingresos por mes (últimos 12 meses)</h2>
+        <div class="grafico">
+          <canvas id="grafico-ingresos"
+                  th:data-etiquetas="${reporte.ingresosPorMes.etiquetas}"
+                  th:data-valores="${reporte.ingresosPorMes.valores}"></canvas>
+          <p class="sin-datos" hidden>Todavía no hay pagos registrados.</p>
+        </div>
+      </div>
+
+      <div class="tarjeta tarjeta-grafico">
+        <h2>Clientes por género</h2>
+        <div class="grafico">
+          <canvas id="grafico-genero"
+                  th:data-etiquetas="${reporte.clientesPorGenero.etiquetas}"
+                  th:data-valores="${reporte.clientesPorGenero.valores}"></canvas>
+          <p class="sin-datos" hidden>Todavía no hay clientes.</p>
+        </div>
+      </div>
+
+      <div class="tarjeta tarjeta-grafico">
+        <h2>Clientes por rango de edad</h2>
+        <div class="grafico">
+          <canvas id="grafico-edad"
+                  th:data-etiquetas="${reporte.clientesPorEdad.etiquetas}"
+                  th:data-valores="${reporte.clientesPorEdad.valores}"></canvas>
+          <p class="sin-datos" hidden>Todavía no hay clientes.</p>
+        </div>
+      </div>
+
+      <div class="tarjeta tarjeta-grafico">
+        <h2>Asistencias por turno</h2>
+        <div class="grafico">
+          <canvas id="grafico-turno"
+                  th:data-etiquetas="${reporte.asistenciasPorTurno.etiquetas}"
+                  th:data-valores="${reporte.asistenciasPorTurno.valores}"></canvas>
+          <p class="sin-datos" hidden>Todavía no hay asistencias registradas.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+<script th:src="@{/js/chart.umd.js}"></script>
+<script th:src="@{/js/reportes.js}"></script>
+</body>
+</html>

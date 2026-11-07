@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro físico</title>
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+
+  <aside th:replace="~{fragmentos/layout :: menu('registro')}"></aside>
+
+  <main class="contenido">
+    <h1 class="titulo-pagina">Registro físico</h1>
+
+    <div class="aviso-ok" th:if="${mensajeOk}" th:text="${mensajeOk}">Listo</div>
+    <div class="aviso-error" th:if="${mensajeError}" th:text="${mensajeError}">Error</div>
+
+    <div class="asistencia-grid">
+
+      <div class="tarjeta formulario">
+        <h2 class="subtitulo">Nueva medición</h2>
+
+        <form th:action="@{/registro-fisico}" method="post">
+
+          <label for="cliente-texto">Cliente *</label>
+          <input type="text" id="cliente-texto" list="lista-clientes"
+                 placeholder="Escribe nombre o documento..." autocomplete="off">
+          <input type="hidden" id="clienteId" name="clienteId">
+          <datalist id="lista-clientes">
+            <option th:each="c : ${clientes}"
+                    th:value="${c.nombre + ' — ' + c.documento}"
+                    th:attr="data-id=${c.clienteId}"></option>
+          </datalist>
+          <p class="alerta" id="cliente-aviso" hidden></p>
+
+          <label for="fecha">Fecha *</label>
+          <input type="date" id="fecha" name="fecha" th:value="${hoy}" th:max="${hoy}" required>
+
+          <div class="fila">
+            <div>
+              <label for="peso">Peso (kg) *</label>
+              <input type="number" id="peso" name="peso" step="0.01" min="20" max="400"
+                     placeholder="Ej: 72.5" required>
+            </div>
+            <div>
+              <label for="altura">Altura (m) *</label>
+              <input type="number" id="altura" name="altura" step="0.01" min="0.5" max="2.5"
+                     placeholder="Ej: 1.75" required>
+            </div>
+          </div>
+
+          <div class="acciones">
+            <button type="submit" class="boton">Guardar medición</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="tarjeta">
+        <div class="barra-busqueda">
+          <input type="search" id="buscador" data-tabla="table.tabla"
+                 placeholder="Buscar por cliente, fecha o clasificación...">
+          <p class="contador" id="contador"
+             th:text="${#lists.size(registros)} + ' registros'">0 registros</p>
+        </div>
+
+        <table class="tabla">
+          <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Peso</th>
+            <th>Altura</th>
+            <th>IMC</th>
+            <th>Clasificación</th>
+            <th>Variación</th>
+            <th>Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="r : ${registros}">
+            <td>
+              <div class="celda-persona">
+                <div class="avatar" th:attr="data-inicial=${#strings.toUpperCase(#strings.substring(r.clienteNombre, 0, 1))}">
+                  <img th:src="@{/clientes/{id}/foto(id=${r.clienteId})}" alt="" loading="lazy" onerror="this.remove()">
+                </div>
+                <a class="enlace-persona" th:href="@{/registro-fisico/cliente/{id}(id=${r.clienteId})}"
+                   th:text="${r.clienteNombre}" title="Ver historial">Cliente</a>
+              </div>
+            </td>
+            <td th:text="${r.fecha}">2026-01-01</td>
+            <td th:text="${r.peso} + ' kg'">72.50 kg</td>
+            <td th:text="${r.altura} + ' m'">1.75 m</td>
+            <td th:text="${r.imc}">23.7</td>
+            <td>
+                                <span class="etiqueta"
+                                      th:classappend="${r.nivelImc == 'ok'} ? 'etiqueta-vigente' : (${r.nivelImc == 'riesgo'} ? 'etiqueta-vencida' : 'etiqueta-alerta')"
+                                      th:text="${r.clasificacion}">Normal</span>
+            </td>
+            <td th:text="${r.variacionTexto}">—</td>
+            <td class="col-acciones">
+              <div class="acciones-fila">
+                <form th:action="@{/registro-fisico/{id}/eliminar(id=${r.id})}" method="post"
+                      onsubmit="return confirm('¿Eliminar esta medición?');">
+                  <button type="submit" class="enlace-eliminar">Eliminar</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(registros)}">
+            <td colspan="8" class="vacio">Todavía no hay mediciones registradas</td>
+          </tr>
+          <tr id="sin-resultados" hidden>
+            <td colspan="8" class="vacio">Ninguna medición coincide con la búsqueda</td>
+          </tr>
+          </tbody>
+        </table>
+        <p class="ayuda-foto ayuda-izquierda" th:text="'Se muestran las últimas ' + ${maximo} + ' mediciones. Haz clic en un nombre para ver su historial.'"></p>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+<script th:src="@{/js/buscador.js}"></script>
+<script th:src="@{/js/asistencia.js}"></script>
+</body>
+</html>

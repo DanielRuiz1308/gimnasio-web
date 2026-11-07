@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historial físico</title>
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+
+  <aside th:replace="~{fragmentos/layout :: menu('registro')}"></aside>
+
+  <main class="contenido">
+    <div class="encabezado-pagina">
+      <div class="resumen-cliente sin-borde">
+        <div class="avatar" th:attr="data-inicial=${#strings.toUpperCase(#strings.substring(cliente.nombre, 0, 1))}">
+          <img th:src="@{/clientes/{id}/foto(id=${cliente.clienteId})}" alt="" onerror="this.remove()">
+        </div>
+        <h1 class="titulo-pagina" th:text="${cliente.nombre}">Cliente</h1>
+      </div>
+      <a class="boton-secundario" th:href="@{/registro-fisico}">Volver</a>
+    </div>
+
+    <div class="aviso-ok" th:if="${mensajeOk}" th:text="${mensajeOk}">Listo</div>
+    <div class="aviso-error" th:if="${mensajeError}" th:text="${mensajeError}">Error</div>
+
+    <div class="resumen-medidas" th:if="${ultimo != null}">
+      <div class="tarjeta dato-tarjeta">
+        <span>Peso actual</span>
+        <strong th:text="${ultimo.peso} + ' kg'">72.50 kg</strong>
+      </div>
+      <div class="tarjeta dato-tarjeta">
+        <span>IMC actual</span>
+        <strong>
+          <span th:text="${ultimo.imc}">23.7</span>
+          <span class="etiqueta"
+                th:classappend="${ultimo.nivelImc == 'ok'} ? 'etiqueta-vigente' : (${ultimo.nivelImc == 'riesgo'} ? 'etiqueta-vencida' : 'etiqueta-alerta')"
+                th:text="${ultimo.clasificacion}">Normal</span>
+        </strong>
+      </div>
+      <div class="tarjeta dato-tarjeta">
+        <span>Cambio total</span>
+        <strong th:text="${cambioTotal}">—</strong>
+      </div>
+      <div class="tarjeta dato-tarjeta">
+        <span>Mediciones</span>
+        <strong th:text="${#lists.size(registros)}">0</strong>
+      </div>
+    </div>
+
+    <div class="asistencia-grid">
+
+      <div class="tarjeta formulario">
+        <h2 class="subtitulo">Nueva medición</h2>
+
+        <form th:action="@{/registro-fisico}" method="post">
+          <input type="hidden" name="clienteId" th:value="${cliente.clienteId}">
+          <input type="hidden" name="desdeCliente" value="true">
+
+          <label for="fecha">Fecha *</label>
+          <input type="date" id="fecha" name="fecha" th:value="${hoy}" th:max="${hoy}" required>
+
+          <div class="fila">
+            <div>
+              <label for="peso">Peso (kg) *</label>
+              <input type="number" id="peso" name="peso" step="0.01" min="20" max="400"
+                     placeholder="Ej: 72.5" required>
+            </div>
+            <div>
+              <label for="altura">Altura (m) *</label>
+              <input type="number" id="altura" name="altura" step="0.01" min="0.5" max="2.5"
+                     th:value="${ultimo != null} ? ${ultimo.altura}" placeholder="Ej: 1.75" required>
+            </div>
+          </div>
+
+          <div class="acciones">
+            <button type="submit" class="boton">Guardar medición</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="tarjeta">
+        <table class="tabla">
+          <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Peso</th>
+            <th>Altura</th>
+            <th>IMC</th>
+            <th>Clasificación</th>
+            <th>Variación</th>
+            <th>Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="r : ${registros}">
+            <td th:text="${r.fecha}">2026-01-01</td>
+            <td th:text="${r.peso} + ' kg'">72.50 kg</td>
+            <td th:text="${r.altura} + ' m'">1.75 m</td>
+            <td th:text="${r.imc}">23.7</td>
+            <td>
+                                <span class="etiqueta"
+                                      th:classappend="${r.nivelImc == 'ok'} ? 'etiqueta-vigente' : (${r.nivelImc == 'riesgo'} ? 'etiqueta-vencida' : 'etiqueta-alerta')"
+                                      th:text="${r.clasificacion}">Normal</span>
+            </td>
+            <td th:text="${r.variacionTexto}">—</td>
+            <td class="col-acciones">
+              <div class="acciones-fila">
+                <form th:action="@{/registro-fisico/{id}/eliminar(id=${r.id})}" method="post"
+                      onsubmit="return confirm('¿Eliminar esta medición?');">
+                  <input type="hidden" name="desdeCliente" value="true">
+                  <button type="submit" class="enlace-eliminar">Eliminar</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(registros)}">
+            <td colspan="7" class="vacio">Este cliente todavía no tiene mediciones</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+</body>
+</html>

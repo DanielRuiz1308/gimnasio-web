@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rutina</title>
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+
+  <aside th:replace="~{fragmentos/layout :: menu('rutinas')}"></aside>
+
+  <main class="contenido">
+    <h1 class="titulo-pagina"
+        th:text="${id != null} ? 'Editar rutina' : 'Nueva rutina'">Nueva rutina</h1>
+
+    <div class="tarjeta formulario formulario-ancho">
+      <div class="aviso-error" th:if="${error}" th:text="${error}">Mensaje de error</div>
+
+      <form id="form-rutina"
+            th:action="${id != null} ? @{/rutinas/{id}(id=${id})} : @{/rutinas}"
+            method="post">
+
+        <!-- Rutina nueva: se elige el cliente (solo los que aún no tienen rutina) -->
+        <th:block th:if="${id == null}">
+          <label for="cliente-texto">Cliente *</label>
+          <input type="text" id="cliente-texto" list="lista-clientes" th:value="${clienteTexto}"
+                 placeholder="Escribe nombre o documento..." autocomplete="off">
+          <input type="hidden" id="clienteId" name="clienteId" th:value="${clienteId}">
+          <datalist id="lista-clientes">
+            <option th:each="c : ${clientes}"
+                    th:value="${c.nombre + ' — ' + c.documento}"
+                    th:attr="data-id=${c.clienteId}"></option>
+          </datalist>
+          <p class="alerta" id="cliente-aviso" hidden></p>
+          <p class="ayuda-foto ayuda-izquierda" th:if="${#lists.isEmpty(clientes)}">
+            Todos los clientes ya tienen una rutina.
+          </p>
+        </th:block>
+
+        <!-- Rutina existente: el cliente no se cambia -->
+        <th:block th:if="${id != null}">
+          <label>Cliente</label>
+          <input type="text" th:value="${clienteNombre}" disabled>
+        </th:block>
+
+        <div class="fila">
+          <div>
+            <label for="nombre">Nombre de la rutina *</label>
+            <input type="text" id="nombre" name="nombre" th:value="${nombre}"
+                   placeholder="Ej: Hipertrofia 4 días" required>
+          </div>
+          <div>
+            <label for="entrenadorId">Entrenador *</label>
+            <select id="entrenadorId" name="entrenadorId" required>
+              <option th:each="e : ${entrenadores}" th:value="${e.id}" th:text="${e.nombre}"
+                      th:selected="${entrenadorId != null and entrenadorId == e.id}">Entrenador</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="fila">
+          <div>
+            <label for="nivel">Nivel</label>
+            <input type="text" id="nivel" name="nivel" th:value="${nivel}" list="niveles"
+                   placeholder="Ej: Principiante">
+            <datalist id="niveles">
+              <option value="Principiante"></option>
+              <option value="Intermedio"></option>
+              <option value="Avanzado"></option>
+            </datalist>
+          </div>
+          <div>
+            <label for="objetivo">Objetivo</label>
+            <input type="text" id="objetivo" name="objetivo" th:value="${objetivo}" list="objetivos"
+                   placeholder="Ej: Ganar masa muscular">
+            <datalist id="objetivos">
+              <option value="Ganar masa muscular"></option>
+              <option value="Perder peso"></option>
+              <option value="Fuerza"></option>
+              <option value="Resistencia"></option>
+              <option value="Tonificación"></option>
+            </datalist>
+          </div>
+        </div>
+
+        <h2 class="subtitulo-seccion">Ejercicios</h2>
+
+        <table class="tabla-ejercicios">
+          <thead>
+          <tr>
+            <th>Ejercicio</th>
+            <th class="col-num">Series</th>
+            <th class="col-num">Repeticiones</th>
+            <th class="col-num">Descanso (seg)</th>
+            <th class="col-quitar"></th>
+          </tr>
+          </thead>
+          <tbody id="ejercicios-cuerpo">
+          <tr th:each="e : ${ejercicios}">
+            <td><input type="text" name="ejNombre" th:value="${e.nombre}" placeholder="Ej: Sentadilla"></td>
+            <td><input type="number" name="ejSeries" min="1" th:value="${e.series > 0 ? e.series : ''}"></td>
+            <td><input type="number" name="ejRepeticiones" min="1" th:value="${e.repeticiones > 0 ? e.repeticiones : ''}"></td>
+            <td><input type="number" name="ejDescanso" min="0" placeholder="60"
+                       th:value="${e.descanso != null and e.descanso >= 0 ? e.descanso : ''}"></td>
+            <td><button type="button" class="quitar-fila">Quitar</button></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <!-- Fila en blanco que el botón "Agregar" copia -->
+        <template id="fila-modelo">
+          <tr>
+            <td><input type="text" name="ejNombre" placeholder="Ej: Sentadilla"></td>
+            <td><input type="number" name="ejSeries" min="1"></td>
+            <td><input type="number" name="ejRepeticiones" min="1"></td>
+            <td><input type="number" name="ejDescanso" min="0" placeholder="60"></td>
+            <td><button type="button" class="quitar-fila">Quitar</button></td>
+          </tr>
+        </template>
+
+        <button type="button" class="boton-agregar" id="agregar-ejercicio">+ Agregar ejercicio</button>
+
+        <div class="acciones">
+          <a class="boton-secundario" th:href="@{/rutinas}">Cancelar</a>
+          <button type="submit" class="boton"
+                  th:text="${id != null} ? 'Guardar cambios' : 'Crear rutina'">Crear rutina</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+</div>
+
+<script th:src="@{/js/asistencia.js}"></script>
+<script th:src="@{/js/rutina.js}"></script>
+</body>
+</html>

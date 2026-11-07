@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Usuario - Lifting Club Fitness</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragmentos/layout :: menu('usuarios')}"></aside>
+    <main class="contenido">
+        <h1 class="titulo-pagina" th:text="${id != null} ? 'Editar usuario' : 'Nuevo usuario'">Usuario</h1>
+
+        <form class="tarjeta formulario" method="post"
+              th:action="${id != null} ? @{/usuarios/{id}(id=${id})} : @{/usuarios}">
+            <div class="aviso-error" th:if="${error}" th:text="${error}"></div>
+
+            <label for="nombreCompleto">Nombre completo *</label>
+            <input id="nombreCompleto" name="nombreCompleto" th:value="${nombreCompleto}" required maxlength="100">
+
+            <label for="nombreUsuario">Usuario *</label>
+            <input id="nombreUsuario" name="nombreUsuario" th:value="${nombreUsuario}" required
+                   minlength="3" maxlength="50" pattern="[A-Za-z0-9._\-]{3,50}"
+                   title="Letras, números, punto, guion o guion bajo (3 a 50)">
+
+            <label for="rol">Rol *</label>
+            <select id="rol" name="rol">
+                <option value="admin" th:selected="${rol == 'admin'}">Administrador</option>
+                <option value="recepcion" th:selected="${rol == 'recepcion'}">Recepción</option>
+                <option value="entrenador" th:selected="${rol == 'entrenador'}">Entrenador</option>
+            </select>
+
+            <div id="bloque-entrenador">
+                <label for="entrenadorId">Entrenador *</label>
+                <select id="entrenadorId" name="entrenadorId">
+                    <option value="">— Elige un entrenador —</option>
+                    <option th:each="e : ${entrenadores}" th:value="${e.id}" th:text="${e.nombre}"
+                            th:selected="${entrenadorId != null and entrenadorId == e.id}"></option>
+                </select>
+            </div>
+
+            <div th:if="${id == null}">
+                <div class="fila">
+                    <div>
+                        <label for="clave">Contraseña * (mín. 8)</label>
+                        <input id="clave" name="clave" type="password" minlength="8" autocomplete="new-password" required>
+                    </div>
+                    <div>
+                        <label for="confirmacion">Confirmar contraseña *</label>
+                        <input id="confirmacion" name="confirmacion" type="password" minlength="8" autocomplete="new-password" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acciones">
+                <a class="boton-secundario" th:href="@{/usuarios}">Cancelar</a>
+                <button class="boton" type="submit" th:text="${id != null} ? 'Guardar cambios' : 'Crear usuario'">Guardar</button>
+            </div>
+        </form>
+    </main>
+</div>
+<script th:src="@{/js/usuario.js}"></script>
+</body>
+</html>

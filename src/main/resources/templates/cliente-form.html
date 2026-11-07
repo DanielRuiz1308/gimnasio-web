@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cliente</title>
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="app">
+
+  <aside th:replace="~{fragmentos/layout :: menu('clientes')}"></aside>
+
+  <main class="contenido">
+    <h1 class="titulo-pagina"
+        th:text="${id != null} ? 'Editar cliente' : 'Nuevo cliente'">Nuevo cliente</h1>
+
+    <div class="formulario-con-foto">
+
+      <div class="tarjeta formulario">
+        <div class="aviso-error" th:if="${error}" th:text="${error}">Mensaje de error</div>
+
+        <form id="formulario-cliente"
+              th:action="${id != null} ? @{/clientes/{id}(id=${id})} : @{/clientes}"
+              method="post" enctype="multipart/form-data">
+
+          <label for="nombre">Nombre completo *</label>
+          <input type="text" id="nombre" name="nombre" th:value="${nombre}"
+                 placeholder="Nombre y apellido" required>
+
+          <div class="fila">
+            <div>
+              <label for="documento">Documento *</label>
+              <input type="text" id="documento" name="documento" th:value="${documento}"
+                     placeholder="Número de documento" required>
+            </div>
+            <div>
+              <label for="telefono">Teléfono</label>
+              <input type="text" id="telefono" name="telefono" th:value="${telefono}"
+                     placeholder="Ej: 3001234567">
+            </div>
+          </div>
+
+          <label for="email">Correo electrónico</label>
+          <input type="email" id="email" name="email" th:value="${email}"
+                 placeholder="correo@ejemplo.com">
+
+          <div class="fila">
+            <div>
+              <label for="genero">Género</label>
+              <select id="genero" name="genero">
+                <option value="M" th:selected="${genero == 'M'}">M</option>
+                <option value="F" th:selected="${genero == 'F'}">F</option>
+                <option value="Otro" th:selected="${genero == 'Otro'}">Otro</option>
+              </select>
+            </div>
+            <div>
+              <label for="fechaNacimiento">Fecha de nacimiento *</label>
+              <input type="date" id="fechaNacimiento" name="fechaNacimiento"
+                     th:value="${fechaNacimiento}" required>
+            </div>
+          </div>
+
+          <div class="acciones">
+            <a class="boton-secundario" th:href="@{/clientes}">Cancelar</a>
+            <button type="submit" class="boton"
+                    th:text="${id != null} ? 'Guardar cambios' : 'Registrar cliente'">Registrar cliente</button>
+          </div>
+        </form>
+      </div>
+
+      <aside class="tarjeta tarjeta-foto">
+        <h2>Foto</h2>
+
+        <div class="foto-marco" id="foto-marco">
+          <span th:text="${#strings.isEmpty(nombre)} ? '?' : ${#strings.toUpperCase(#strings.substring(nombre, 0, 1))}">?</span>
+          <img th:if="${tieneFoto}" th:src="@{/clientes/{id}/foto(id=${id})}" alt="Foto del cliente">
+        </div>
+
+        <label class="boton-foto">
+          Elegir foto
+          <input type="file" id="foto" name="foto" form="formulario-cliente"
+                 accept="image/png, image/jpeg, image/webp">
+        </label>
+        <p class="ayuda-foto">JPG, PNG o WebP. Se recorta cuadrada.</p>
+
+        <label class="quitar-foto" th:if="${tieneFoto}">
+          <input type="checkbox" id="quitarFoto" name="quitarFoto" value="true" form="formulario-cliente">
+          Quitar foto actual
+        </label>
+      </aside>
+
+    </div>
+  </main>
+
+</div>
+
+<script th:src="@{/js/foto.js}"></script>
+</body>
+</html>

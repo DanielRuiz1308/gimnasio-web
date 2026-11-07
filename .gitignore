@@ -1,0 +1,25 @@
+# Compilación de Maven
+target/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+nbproject/
+nbactions.xml
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Secretos: nunca subir claves
+.env
+*.env
+application-local.properties
+application-local.yml
+
+# Registros
+*.log
