@@ -80,47 +80,6 @@ Usuario inicial: **admin** / contraseña **admin123**.
 - Los formularios no usan tokens CSRF (la cookie de sesión usa `SameSite=Lax`). Para un uso real en producción se recomienda migrar a Spring Security.
 - Las zonas horarias se manejan en `America/Bogota`, de modo que las fechas son correctas aunque el servidor esté en UTC.
 
-## Despliegue en Railway (para la presentación)
-
-Railway corre la JVM de verdad y puede adjuntar MySQL en el mismo proyecto. Es el
-camino para mostrar la app mañana. El plan de prueba da $5 por 30 días (luego $1
-al mes) y permite bases de datos. No hace falta tarjeta si la cuenta de GitHub
-se verifica.
-
-### Pasos
-
-1. Sube esta rama a GitHub (`deploy/vercel-serverless`).
-2. En [railway.com/new](https://railway.com/new): **Deploy from GitHub repo** y elige
-   esta rama. Railway detecta el `Dockerfile`.
-3. En el mismo proyecto: **+ New → Database → MySQL**. Espera a que arranque.
-4. En el servicio de la app, pestaña **Variables**, agrega:
-
-   | Variable | Valor |
-   |---|---|
-   | `DB_URL` | `jdbc:mysql://${{MySQL.MYSQLHOST}}:${{MySQL.MYSQLPORT}}/${{MySQL.MYSQLDATABASE}}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Bogota` |
-   | `DB_USER` | `${{MySQL.MYSQLUSER}}` |
-   | `DB_PASSWORD` | `${{MySQL.MYSQLPASSWORD}}` |
-
-   Railway sustituye `${{MySQL.*}}` por las credenciales del plugin. El nombre
-   `MySQL` es el del servicio de base de datos; si lo renombras, cambia el prefijo.
-5. Carga el esquema. Desde tu máquina, con el TCP Proxy público de MySQL
-   (Settings → Networking → Public Access del servicio MySQL):
-
-   ```bash
-   mysql -h HOST_PUBLICO -P PUERTO -u root -p gimnasio_db < gimnasio_db_v2.sql
-   ```
-
-   Si el plugin ya creó otra base, crea `gimnasio_db` antes o cambia el nombre
-   en `DB_URL` para que coincida con `MYSQLDATABASE`.
-6. En el servicio de la app: **Settings → Networking → Generate Domain**.
-7. Abre la URL. Usuario inicial: **admin** / **admin123**. Cámbiala en cuanto entres.
-
-La primera construcción descarga Maven y puede tardar varios minutos. Si el build
-se corta, vuelve a desplegar: Railway reutiliza las capas ya cacheadas.
-
-El archivo `railway.json` marca el `Dockerfile` como builder y usa `/login` como
-healthcheck (no requiere sesión).
-
 ## Despliegue en Vercel (rama `deploy/vercel-serverless`)
 
 Esta rama empaqueta la aplicación como una imagen de contenedor y la publica con el
