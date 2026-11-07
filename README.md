@@ -79,3 +79,39 @@ Usuario inicial: **admin** / contraseña **admin123**.
 - El acceso está protegido por sesión y por rol; el inicio de sesión se bloquea temporalmente tras varios intentos fallidos.
 - Los formularios no usan tokens CSRF (la cookie de sesión usa `SameSite=Lax`). Para un uso real en producción se recomienda migrar a Spring Security.
 - Las zonas horarias se manejan en `America/Bogota`, de modo que las fechas son correctas aunque el servidor esté en UTC.
+
+## Despliegue en Railway (rama `deploy/railway`)
+
+Esta rama es la aplicación tal como está, más el puerto que Railway inyecta.
+No lleva Dockerfile ni configuración de Vercel. Railway detecta Java y construye
+con Railpack.
+
+### Pasos
+
+1. Sube esta rama a GitHub.
+2. En [railway.com/new](https://railway.com/new): **Deploy from GitHub repo** y elige
+   la rama `deploy/railway`.
+3. En el mismo proyecto: **+ New → Database → MySQL**. Espera a que arranque.
+4. En el servicio de la app, pestaña **Variables**:
+
+   | Variable | Valor |
+   |---|---|
+   | `DB_URL` | `jdbc:mysql://${{MySQL.MYSQLHOST}}:${{MySQL.MYSQLPORT}}/${{MySQL.MYSQLDATABASE}}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Bogota` |
+   | `DB_USER` | `${{MySQL.MYSQLUSER}}` |
+   | `DB_PASSWORD` | `${{MySQL.MYSQLPASSWORD}}` |
+
+   El prefijo `MySQL` es el nombre del servicio de base de datos.
+5. Carga el esquema contra el MySQL del proyecto (Settings → Networking →
+   Public Access en el servicio MySQL):
+
+   ```bash
+   mysql -h HOST_PUBLICO -P PUERTO -u root -p NOMBRE_BD < gimnasio_db_v2.sql
+   ```
+
+   `DB_URL` debe apuntar a la misma base que creó el script (`gimnasio_db`), o
+   ajusta el nombre para que coincida con `MYSQLDATABASE`.
+6. En el servicio de la app: **Settings → Networking → Generate Domain**.
+7. Abre la URL. Usuario inicial: **admin** / **admin123**. Cámbiala en cuanto entres.
+
+Conecta GitHub en Railway para que la prueba sea completa (red saliente y bases
+de datos). Sin esa verificación, la app puede no alcanzar MySQL.
