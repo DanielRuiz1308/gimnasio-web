@@ -1,0 +1,14 @@
+target/
+.idea/
+.vscode/
+.git/
+.gitignore
+*.iml
+.DS_Store
+*.log
+.env
+*.env
+application-local.properties
+application-local.yml
+README.md
+HELP.md
